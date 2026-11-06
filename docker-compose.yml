@@ -1,0 +1,61 @@
+services:
+  akaunting.php:
+    # Runtime compatibility line for Akaunting 3. Bump this only when the
+    # supported Akaunting major requires a different Docker/PHP runtime.
+    image: ghcr.io/librecodecoop/akaunting-docker-php:${RUNTIME_VERSION:-3}
+    volumes:
+      - ./volumes/akaunting:/var/www/html
+      - ./patches:/opt/akaunting/patches:ro
+      - ./volumes/patches:/opt/akaunting/patches.local:ro
+    restart: unless-stopped
+    environment:
+      - HOST_UID=${HOST_UID:-1000}
+      - HOST_GID=${HOST_GID:-1000}
+
+      # Akaunting application version installed in /var/www/html.
+      # renovate: datasource=github-releases depName=akaunting/akaunting
+      - AKAUNTING_VERSION=${AKAUNTING_VERSION:-3.2.4}
+      - ADM_EMAIL=${ADM_EMAIL:-admin@test.domain}
+      - ADM_PASSWD=${ADM_PASSWD:-admin}
+
+      - APP_ENV=${APP_ENV:-local}
+
+      - DB_CONNECTION=${DB_CONNECTION:-mysql}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_HOST=${DB_HOST:-akaunting.mysql}
+      - DB_DATABASE=${DB_DATABASE:-akaunting}
+      - DB_USERNAME=${DB_USERNAME:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-root}
+      - DB_PREFIX=${DB_PREFIX:-}
+      - DB_WAIT_TIMEOUT=${DB_WAIT_TIMEOUT:-60}
+
+      - XDEBUG_MODE=${XDEBUG_MODE:-off}
+      - XDEBUG_CONFIG
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  akaunting.nginx:
+    image: ghcr.io/librecodecoop/akaunting-docker-nginx:${RUNTIME_VERSION:-3}
+    restart: unless-stopped
+    volumes:
+      - ./volumes/akaunting:/var/www/html:ro
+    depends_on:
+      - akaunting.php
+    ports:
+      - ${HTTP_PORT:-80}:80
+
+  akaunting.mysql:
+    image: mysql:26.7@sha256:9d48c42f8341068f199116dfccb919b607c99765b5c61e549a548a43033471a4
+    restart: unless-stopped
+    volumes:
+      - ./volumes/mysql/data:/var/lib/mysql
+      - ./volumes/mysql/dump:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-akaunting}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${MYSQL_ROOT_PASSWORD:-root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s

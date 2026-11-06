@@ -1,0 +1,75 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "enabledManagers": [
+    "custom.regex"
+  ],
+  "dependencyDashboard": false,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker-compose\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+- AKAUNTING_VERSION=\\$\\{AKAUNTING_VERSION:-(?<currentValue>[^}]+)\\}"
+      ],
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/actionlint\\.yml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+ACTIONLINT_VERSION: (?<currentValue>\\S+)"
+      ],
+      "versioningTemplate": "semver-coerced"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.docker\\/php\\/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+ARG NPM_VERSION=(?<currentValue>\\S+)"
+      ],
+      "versioningTemplate": "semver-coerced"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.docker\\/php\\/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "FROM php:(?<currentValue>8\\.3\\.\\d+-fpm-trixie)@(?<currentDigest>sha256:[a-f0-9]{64}) AS runtime"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "php",
+      "versioningTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "npm"
+      ],
+      "matchDepNames": [
+        "npm"
+      ],
+      "allowedVersions": "<12"
+    },
+    {
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchPackageNames": [
+        "php"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "enabled": false
+    }
+  ]
+}

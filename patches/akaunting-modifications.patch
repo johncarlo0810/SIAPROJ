@@ -1,0 +1,12 @@
+diff --git a/app/Http/Kernel.php b/app/Http/Kernel.php
+--- a/app/Http/Kernel.php
++++ b/app/Http/Kernel.php
+@@ -49,7 +49,7 @@ class Kernel extends HttpKernel
+             'header.www.authenticate', // Centralize WWW-Authenticate handling for API 401 responses
+             'auth.dynamic.once', // Unified: Bearer (OAuth) OR Basic Auth — auto-detected per request
+             'auth.disabled',
+-            'throttle:api',
++            // 'throttle:api',
+             'permission:read-api',
+             'company.identify',
+             'bindings',
