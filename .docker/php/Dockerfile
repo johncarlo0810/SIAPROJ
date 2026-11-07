@@ -7,6 +7,7 @@ FROM php:8.3.36-fpm-trixie@sha256:d0dea3f5d95314eac94a732469f4cf0ee658a22c2ce3f2
 
 
 RUN apt-get update \
+    && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         git \
         rsync \
